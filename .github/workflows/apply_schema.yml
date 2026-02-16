@@ -1,0 +1,32 @@
+name: Apply DB Schema
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'db/schema.sql'
+      - '.github/workflows/apply_schema.yml'
+
+jobs:
+  apply-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply schema using Dockerized psql
+        env:
+          RENDER_DB_URL: ${{ secrets.RENDER_DB_URL }}
+        run: |
+          if [ -z "$RENDER_DB_URL" ]; then
+            echo "🔒 O segredo RENDER_DB_URL não está definido. Vá em Settings → Secrets do repositório e adicione a connection string do banco." >&2
+            exit 1
+          fi
+
+          echo "🔎 Verificando schema file"
+          ls -la db/schema.sql
+
+          echo "🚀 Executando schema contra: $RENDER_DB_URL"
+
+          # Usamos imagem oficial do Postgres para executar psql
+          docker run --rm -v "$PWD":/work -w /work postgres:15 psql "$RENDER_DB_URL" -f db/schema.sql
