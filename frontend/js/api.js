@@ -1,6 +1,6 @@
 // API Configuration
 // URL do backend no Render (atualize se a URL for diferente)
-const API_BASE_URL = 'https://mercadinho-uniao-api.onrender.com/api';
+const API_BASE_URL = 'https://mercadinho-uniao.onrender.com/api';
 
 // Auth Token
 let authToken = localStorage.getItem('authToken');
