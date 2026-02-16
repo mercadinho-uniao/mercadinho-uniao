@@ -98,12 +98,16 @@ function displayProducts() {
 function createProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card';
+    // Garantir que o preço seja um número válido antes de formatar
+    const priceNum = Number(product.price);
+    const priceStr = Number.isFinite(priceNum) ? priceNum.toFixed(2) : '0.00';
+
     card.innerHTML = `
         <div class="product-image">${product.emoji || '📦'}</div>
         <div class="product-info">
             <div class="product-category">${getCategoryLabel(product.category)}</div>
             <div class="product-name">${product.name}</div>
-            <div class="product-price">R$ ${product.price.toFixed(2)}</div>
+            <div class="product-price">R$ ${priceStr}</div>
             <div class="product-stock">
                 ${product.stock > 0 ? `${product.stock} em estoque` : 'Fora de estoque'}
             </div>
@@ -125,9 +129,11 @@ function createProductCard(product) {
 // Abrir modal de adicionar ao carrinho
 function openAddToCartModal(product) {
     selectedProduct = product;
+    const modalPriceNum = Number(product.price);
+    const modalPriceStr = Number.isFinite(modalPriceNum) ? modalPriceNum.toFixed(2) : '0.00';
     document.getElementById('modal-product-name').textContent = product.name;
     document.getElementById('modal-product-description').textContent = `Categoria: ${getCategoryLabel(product.category)}`;
-    document.getElementById('modal-product-price').textContent = product.price.toFixed(2);
+    document.getElementById('modal-product-price').textContent = modalPriceStr;
     document.getElementById('qty-input').value = 1;
     
     addToCartModal.classList.remove('hidden');
