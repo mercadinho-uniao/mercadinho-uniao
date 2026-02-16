@@ -1,7 +1,6 @@
 // API Configuration
-// Para desenvolvimento local: 'http://localhost:3000/api'
-// Para Render cloud: 'https://mercadinho-uniao-api.onrender.com/api'
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mercadinho-uniao-api.onrender.com/api';
+// URL do backend no Render (atualize se a URL for diferente)
+const API_BASE_URL = 'https://mercadinho-uniao-api.onrender.com/api';
 
 // Auth Token
 let authToken = localStorage.getItem('authToken');
