@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Mercadinho União</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">🛒 Mercadinho União</div>
+            <nav class="nav-menu">
+                <a href="../index.html" class="nav-link">Produtos</a>
+                <a href="cart.html" class="nav-link">Carrinho <span id="cart-count" class="badge">0</span></a>
+                <a href="orders.html" class="nav-link">Meus Pedidos</a>
+                <button id="logout-btn" class="nav-link logout-btn" style="display:none;">Sair</button>
+                <button id="login-btn" class="nav-link login-btn">Entrar</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <section class="products-section">
+            <h2>Finalizar Pedido</h2>
+            
+            <div class="checkout-container">
+                <div class="checkout-form">
+                    <h3>Dados de Entrega</h3>
+                    <form id="checkout-form">
+                        <input type="text" id="customer-name" placeholder="Nome Completo" required>
+                        <input type="email" id="customer-email" placeholder="Email" required>
+                        <input type="tel" id="customer-phone" placeholder="Telefone" required>
+                        <input type="text" id="customer-address" placeholder="Endereço" required>
+                        <input type="text" id="customer-number" placeholder="Número" required>
+                        <input type="text" id="customer-complement" placeholder="Complemento (opcional)">
+                        <input type="text" id="customer-neighborhood" placeholder="Bairro" required>
+                        <input type="text" id="customer-cep" placeholder="CEP" required>
+
+                        <h3 style="margin-top: 2rem;">Forma de Pagamento</h3>
+                        <div class="payment-methods">
+                            <label class="payment-option">
+                                <input type="radio" name="payment-method" value="dinheiro" checked>
+                                <span>💵 Dinheiro</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment-method" value="cartao">
+                                <span>💳 Cartão</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment-method" value="pix">
+                                <span>🔷 PIX</span>
+                            </label>
+                        </div>
+
+                        <div id="card-fields" style="display:none; margin-top: 1rem;">
+                            <input type="text" placeholder="Número do Cartão" required>
+                            <input type="text" placeholder="Nome no Cartão" required>
+                            <div style="display: flex; gap: 1rem;">
+                                <input type="text" placeholder="MM/AA" style="flex: 1;" required>
+                                <input type="text" placeholder="CVV" style="flex: 1;" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="margin-top: 1.5rem; width: 100%;">
+                            Confirmar Pedido
+                        </button>
+                    </form>
+                </div>
+
+                <div class="checkout-summary">
+                    <h3>Resumo do Pedido</h3>
+                    <div id="summary-items"></div>
+                    <div class="summary-totals">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="summary-subtotal">R$ 0,00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Taxa de Entrega:</span>
+                            <span>Grátis</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="summary-total">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Mercadinho União. Todos os direitos reservados.</p>
+        <p>Entregas a partir de R$ 100,00</p>
+    </footer>
+
+    <style>
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .checkout-form,
+        .checkout-summary {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .checkout-form h3,
+        .checkout-summary h3 {
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .checkout-form form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .checkout-form input {
+            padding: 0.8rem;
+            border: 2px solid var(--light-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .checkout-form input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid var(--light-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-option:hover {
+            border-color: var(--secondary-color);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .payment-option input[type="radio"] {
+            margin-right: 0.8rem;
+            cursor: pointer;
+        }
+
+        .payment-option input[type="radio"]:checked + span {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .checkout-summary {
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        #summary-items {
+            margin-bottom: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--light-color);
+            font-size: 0.9rem;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-totals {
+            border-top: 2px solid var(--dark-color);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .summary-row.total {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/cart.js"></script>
+    <script>
+        // Verificar autenticação
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!isAuthenticated()) {
+                alert('Você precisa estar logado para fazer pedidos');
+                location.href = '../index.html';
+                return;
+            }
+
+            loadCheckoutSummary();
+            setupPaymentMethodChange();
+            setupCheckoutForm();
+        });
+
+        function loadCheckoutSummary() {
+            const summaryItems = document.getElementById('summary-items');
+            let html = '';
+
+            cart.items.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                html += `
+                    <div class="summary-item">
+                        <span>${item.quantity}x ${item.name}</span>
+                        <span>R$ ${subtotal.toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            summaryItems.innerHTML = html;
+
+            const total = cart.getTotal();
+            document.getElementById('summary-subtotal').textContent = `R$ ${total.toFixed(2)}`;
+            document.getElementById('summary-total').textContent = `R$ ${total.toFixed(2)}`;
+        }
+
+        function setupPaymentMethodChange() {
+            const paymentMethods = document.querySelectorAll('input[name="payment-method"]');
+            const cardFields = document.getElementById('card-fields');
+
+            paymentMethods.forEach(method => {
+                method.addEventListener('change', (e) => {
+                    if (e.target.value === 'cartao') {
+                        cardFields.style.display = 'flex';
+                        cardFields.style.flexDirection = 'column';
+                        cardFields.style.gap = '0.8rem';
+                    } else {
+                        cardFields.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        function setupCheckoutForm() {
+            const form = document.getElementById('checkout-form');
+            const user = getCurrentUser();
+
+            // Preencher dados do usuário
+            if (user) {
+                document.getElementById('customer-name').value = user.name || '';
+                document.getElementById('customer-email').value = user.email || '';
+                document.getElementById('customer-phone').value = user.phone || '';
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                if (cart.isEmpty()) {
+                    alert('Seu carrinho está vazio');
+                    return;
+                }
+
+                // Preparar dados do pedido
+                const orderData = {
+                    items: cart.items,
+                    total: cart.getTotal(),
+                    delivery: {
+                        name: document.getElementById('customer-name').value,
+                        email: document.getElementById('customer-email').value,
+                        phone: document.getElementById('customer-phone').value,
+                        address: document.getElementById('customer-address').value,
+                        number: document.getElementById('customer-number').value,
+                        complement: document.getElementById('customer-complement').value,
+                        neighborhood: document.getElementById('customer-neighborhood').value,
+                        cep: document.getElementById('customer-cep').value
+                    },
+                    paymentMethod: document.querySelector('input[name="payment-method"]:checked').value
+                };
+
+                try {
+                    const response = await api.createOrder(orderData);
+                    console.log('Pedido criado:', response);
+                    
+                    cart.clear();
+                    alert('Pedido realizado com sucesso!');
+                    location.href = 'orders.html';
+                } catch (error) {
+                    alert('Erro ao processar pedido: ' + error.message);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

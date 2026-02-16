@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho - Mercadinho União</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">🛒 Mercadinho União</div>
+            <nav class="nav-menu">
+                <a href="../index.html" class="nav-link">Produtos</a>
+                <a href="cart.html" class="nav-link active">Carrinho <span id="cart-count" class="badge">0</span></a>
+                <a href="orders.html" class="nav-link">Meus Pedidos</a>
+                <button id="logout-btn" class="nav-link logout-btn" style="display:none;">Sair</button>
+                <button id="login-btn" class="nav-link login-btn">Entrar</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <section class="products-section">
+            <h2>Seu Carrinho</h2>
+            
+            <div id="cart-content">
+                <!-- Conteúdo do carrinho carregado via JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Mercadinho União. Todos os direitos reservados.</p>
+        <p>Entregas a partir de R$ 100,00</p>
+    </footer>
+
+    <style>
+        .cart-empty {
+            text-align: center;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+        }
+
+        .cart-empty a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-table th {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .cart-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-color);
+        }
+
+        .cart-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .item-quantity {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .item-quantity button {
+            padding: 0.3rem 0.7rem;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .item-quantity input {
+            width: 50px;
+            text-align: center;
+            padding: 0.3rem;
+            border: 1px solid var(--light-color);
+            border-radius: 4px;
+        }
+
+        .remove-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .remove-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .cart-summary {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+            max-width: 400px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--light-color);
+        }
+
+        .summary-row.total {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            border-bottom: none;
+            margin-top: 0.5rem;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .checkout-btn:hover:not(:disabled) {
+            background-color: #27ae60;
+        }
+
+        .checkout-btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .minimum-warning {
+            background-color: #ffeaa7;
+            color: #d63031;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .minimum-warning.show {
+            display: block;
+        }
+    </style>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/cart.js"></script>
+    <script>
+        // Carregar conteúdo do carrinho
+        function loadCart() {
+            const cartContent = document.getElementById('cart-content');
+            const cartItems = cart.items;
+
+            if (cartItems.length === 0) {
+                cartContent.innerHTML = `
+                    <div class="cart-empty">
+                        <h3>Seu carrinho está vazio</h3>
+                        <p>Adicione produtos do nosso catálogo</p>
+                        <a href="../index.html">Voltar às compras</a>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Preço</th>
+                            <th>Quantidade</th>
+                            <th>Subtotal</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            cartItems.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                html += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>R$ ${item.price.toFixed(2)}</td>
+                        <td>
+                            <div class="item-quantity">
+                                <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                                <input type="number" value="${item.quantity}" readonly>
+                                <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                            </div>
+                        </td>
+                        <td>R$ ${subtotal.toFixed(2)}</td>
+                        <td>
+                            <button class="remove-btn" onclick="removeItemFromCart(${item.id})">Remover</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const total = cart.getTotal();
+            const canDeliver = cart.canDeliver();
+            const missing = cart.getMissingForDelivery();
+
+            html += `
+                    </tbody>
+                </table>
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span>R$ ${total.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Taxa de Entrega:</span>
+                        <span>Grátis</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span>R$ ${total.toFixed(2)}</span>
+                    </div>
+                    <button class="checkout-btn" ${!canDeliver ? 'disabled' : ''} onclick="goToCheckout()">
+                        ${canDeliver ? 'Ir para Pagamento' : `Falta R$ ${missing.toFixed(2)}`}
+                    </button>
+            `;
+
+            if (!canDeliver) {
+                html += `
+                    <div class="minimum-warning show">
+                        ⚠️ Valor mínimo de entrega: R$ 100,00. Faltam R$ ${missing.toFixed(2)}
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+
+            cartContent.innerHTML = html;
+        }
+
+        // Atualizar quantidade
+        function updateQuantity(productId, newQuantity) {
+            cart.updateQuantity(productId, newQuantity);
+            loadCart();
+            cart.updateCartCount();
+        }
+
+        // Remover item
+        function removeItemFromCart(productId) {
+            cart.removeItem(productId);
+            loadCart();
+            cart.updateCartCount();
+        }
+
+        // Ir para checkout
+        function goToCheckout() {
+            location.href = 'checkout.html';
+        }
+
+        // Carregar ao iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCart();
+            cart.updateCartCount();
+        });
+    </script>
+</body>
+</html>

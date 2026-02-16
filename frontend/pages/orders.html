@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Pedidos - Mercadinho União</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">🛒 Mercadinho União</div>
+            <nav class="nav-menu">
+                <a href="../index.html" class="nav-link">Produtos</a>
+                <a href="cart.html" class="nav-link">Carrinho <span id="cart-count" class="badge">0</span></a>
+                <a href="orders.html" class="nav-link active">Meus Pedidos</a>
+                <button id="logout-btn" class="nav-link logout-btn" style="display:none;">Sair</button>
+                <button id="login-btn" class="nav-link login-btn">Entrar</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <section class="products-section">
+            <h2>Meus Pedidos</h2>
+            
+            <div id="orders-content">
+                <!-- Pedidos carregados via JavaScript -->
+                <div class="loading">Carregando pedidos...</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Mercadinho União. Todos os direitos reservados.</p>
+        <p>Entregas a partir de R$ 100,00</p>
+    </footer>
+
+    <style>
+        .orders-empty {
+            text-align: center;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+        }
+
+        .orders-empty a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .order-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--light-color);
+        }
+
+        .order-id {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-on-way {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-items {
+            margin-bottom: 1rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--light-color);
+        }
+
+        .order-total {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .order-date {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+    </style>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/cart.js"></script>
+    <script>
+        // Verificar autenticação
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!isAuthenticated()) {
+                showNotAuthenticated();
+                return;
+            }
+
+            loadOrders();
+        });
+
+        function showNotAuthenticated() {
+            const ordersContent = document.getElementById('orders-content');
+            ordersContent.innerHTML = `
+                <div class="orders-empty">
+                    <h3>Acesso Não Autorizado</h3>
+                    <p>Você precisa estar logado para ver seus pedidos</p>
+                    <a href="../index.html">Voltar à página inicial</a>
+                </div>
+            `;
+        }
+
+        async function loadOrders() {
+            const ordersContent = document.getElementById('orders-content');
+            
+            try {
+                const orders = await api.getOrders();
+
+                if (!orders || orders.length === 0) {
+                    ordersContent.innerHTML = `
+                        <div class="orders-empty">
+                            <h3>Nenhum Pedido Encontrado</h3>
+                            <p>Você ainda não fez nenhum pedido</p>
+                            <a href="../index.html">Fazer Compras</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                orders.forEach(order => {
+                    html += createOrderCard(order);
+                });
+
+                ordersContent.innerHTML = html;
+            } catch (error) {
+                ordersContent.innerHTML = `
+                    <div class="orders-empty">
+                        <h3>Erro ao Carregar Pedidos</h3>
+                        <p>${error.message}</p>
+                        <a href="../index.html">Voltar</a>
+                    </div>
+                `;
+            }
+        }
+
+        function createOrderCard(order) {
+            const statusClasses = {
+                'pendente': 'status-pending',
+                'confirmado': 'status-confirmed',
+                'a-caminho': 'status-on-way',
+                'entregue': 'status-delivered',
+                'cancelado': 'status-cancelled'
+            };
+
+            const statusLabels = {
+                'pendente': '⏳ Pendente',
+                'confirmado': '✅ Confirmado',
+                'a-caminho': '🚚 A Caminho',
+                'entregue': '📦 Entregue',
+                'cancelado': '❌ Cancelado'
+            };
+
+            const statusClass = statusClasses[order.status] || 'status-pending';
+            const statusLabel = statusLabels[order.status] || order.status;
+
+            let itemsHtml = '';
+            (order.items || []).forEach(item => {
+                itemsHtml += `
+                    <div class="order-item">
+                        <span>${item.quantity}x ${item.name}</span>
+                        <span>R$ ${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            return `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-id">Pedido #${order.id}</div>
+                            <div class="order-date">${new Date(order.createdAt).toLocaleDateString('pt-BR')}</div>
+                        </div>
+                        <span class="order-status ${statusClass}">${statusLabel}</span>
+                    </div>
+                    <div class="order-items">
+                        ${itemsHtml}
+                    </div>
+                    <div class="order-footer">
+                        <div>
+                            <div class="order-date">Entrega em: ${order.delivery?.neighborhood || 'Não informado'}, ${order.delivery?.cep || ''}</div>
+                        </div>
+                        <div class="order-total">R$ ${order.total.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

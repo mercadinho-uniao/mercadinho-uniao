@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercadinho União - Delivery</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">🛒 Mercadinho União</div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link active">Produtos</a>
+                <a href="pages/cart.html" class="nav-link">Carrinho <span id="cart-count" class="badge">0</span></a>
+                <a href="pages/orders.html" class="nav-link">Meus Pedidos</a>
+                <button id="logout-btn" class="nav-link logout-btn" style="display:none;">Sair</button>
+                <button id="login-btn" class="nav-link login-btn">Entrar</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Search and Filter -->
+        <section class="search-filter">
+            <input type="text" id="search-input" class="search-input" placeholder="Buscar produtos...">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">Todos</button>
+                <button class="filter-btn" data-category="padaria">Padaria</button>
+                <button class="filter-btn" data-category="quitanda">Quitanda</button>
+                <button class="filter-btn" data-category="acougue">Açougue</button>
+            </div>
+        </section>
+
+        <!-- Products Grid -->
+        <section class="products-section">
+            <h2>Produtos Disponíveis</h2>
+            <div id="products-grid" class="products-grid">
+                <!-- Produtos carregados via JavaScript -->
+                <div class="loading">Carregando produtos...</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Login -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Entrar na sua Conta</h2>
+            <form id="login-form">
+                <input type="email" placeholder="Email" required>
+                <input type="password" placeholder="Senha" required>
+                <button type="submit" class="btn-primary">Entrar</button>
+                <p>Não tem conta? <a href="#" id="switch-to-register">Registrar-se</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div id="register-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Criar Conta</h2>
+            <form id="register-form">
+                <input type="text" placeholder="Nome Completo" required>
+                <input type="email" placeholder="Email" required>
+                <input type="tel" placeholder="Telefone" required>
+                <input type="password" placeholder="Senha" required>
+                <input type="password" placeholder="Confirmar Senha" required>
+                <button type="submit" class="btn-primary">Registrar</button>
+                <p>Já tem conta? <a href="#" id="switch-to-login">Entrar</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar ao Carrinho -->
+    <div id="add-to-cart-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-product-name"></h2>
+            <p id="modal-product-description"></p>
+            <div class="modal-price">R$ <span id="modal-product-price"></span></div>
+            <div class="quantity-selector">
+                <button id="qty-minus" class="qty-btn">-</button>
+                <input type="number" id="qty-input" value="1" min="1">
+                <button id="qty-plus" class="qty-btn">+</button>
+            </div>
+            <button id="add-to-cart-btn" class="btn-primary">Adicionar ao Carrinho</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Mercadinho União. Todos os direitos reservados.</p>
+        <p>Entregas a partir de R$ 100,00</p>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
