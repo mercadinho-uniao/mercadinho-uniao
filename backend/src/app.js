@@ -12,10 +12,30 @@ const paymentRoutes = require('./routes/payments');
 const app = express();
 
 // Middleware
-app.use(cors({
-    origin: (process.env.CORS_ORIGIN || 'http://localhost:3000').split(','),
-    credentials: true
-}));
+// CORS configuration: support comma-separated origins or '*'.
+const rawOrigins = process.env.CORS_ORIGIN || '*';
+const allowedOrigins = rawOrigins.split(',').map(s => s.trim()).filter(Boolean);
+
+if (allowedOrigins.includes('*')) {
+    // Allow any origin (useful for quick testing). In production, prefer explicit origins.
+    app.use(cors({ origin: true, credentials: true }));
+} else {
+    app.use(cors({
+        origin: function (origin, callback) {
+            // Allow non-browser requests (e.g. curl, server-to-server) when origin is undefined
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.indexOf(origin) !== -1) {
+                callback(null, true);
+            } else {
+                callback(new Error('CORS policy: Origin not allowed'));
+            }
+        },
+        credentials: true
+    }));
+}
+
+// Ensure OPTIONS preflight requests are handled
+app.options('*', cors());
 app.use(express.json());
 
 // Health check
